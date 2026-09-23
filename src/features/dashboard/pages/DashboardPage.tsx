@@ -1,35 +1,17 @@
-import { ArrowUpRight, BriefcaseBusiness, CircleDollarSign, Users } from 'lucide-react'
+import { ArrowUpRight, BriefcaseBusiness, CircleDollarSign, FileText, Users, X, Activity, CheckCircle2 } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useState } from 'react'
 import { metrics, revenue } from '../data'
-
 const icons = [CircleDollarSign, Users, BriefcaseBusiness, ArrowUpRight]
-
 export function DashboardPage() {
+  const [reportOpen, setReportOpen] = useState(false)
+  const [selectedSystem, setSelectedSystem] = useState<string | null>(null)
   return <main className="page">
-    <header className="page-header">
-      <div><span className="eyebrow">Operations</span><h1>Enterprise overview</h1><p>Monitor business performance and operational health.</p></div>
-      <button className="primary-button">Generate report</button>
-    </header>
-    <section className="metric-grid" aria-label="Business metrics">
-      {metrics.map((metric, index) => { const Icon = icons[index]; return <article className="metric-card" key={metric.label}>
-        <div className="metric-icon"><Icon size={20} /></div><span>{metric.label}</span><strong>{metric.value}</strong>
-        <small className="positive">+{metric.change}% vs previous period</small>
-      </article> })}
-    </section>
-    <section className="content-grid">
-      <article className="panel">
-        <div className="panel-header"><div><span className="eyebrow">Financial performance</span><h2>Revenue vs target</h2></div><span className="status">Live data</span></div>
-        <div className="chart"><ResponsiveContainer width="100%" height="100%">
-          <BarChart data={revenue}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="month" /><YAxis /><Tooltip />
-            <Bar dataKey="revenue" radius={[6,6,0,0]} /><Bar dataKey="target" radius={[6,6,0,0]} />
-          </BarChart>
-        </ResponsiveContainer></div>
-      </article>
-      <article className="panel"><div className="panel-header"><div><span className="eyebrow">Operational health</span><h2>Systems</h2></div></div>
-        <div className="system-list">{['Core API','Payments','Notifications','Analytics'].map(system => <div className="system-row" key={system}>
-          <span className="health-dot" /><span>{system}</span><small>Operational</small>
-        </div>)}</div>
-      </article>
-    </section>
+    <header className="page-header"><div><span className="eyebrow">Operations</span><h1>Enterprise overview</h1><p>Monitor business performance and operational health.</p></div><div className="header-actions"><button className="secondary-button" onClick={() => setReportOpen(true)}><FileText size={16}/> Preview report</button><button className="primary-button" onClick={() => setReportOpen(true)}>Generate report</button></div></header>
+    <section className="metric-grid" aria-label="Business metrics">{metrics.map((metric, index) => { const Icon = icons[index]; return <button className="metric-card metric-card-button" key={metric.label} onClick={() => setSelectedSystem(metric.label)}><div className="metric-icon"><Icon size={20} /></div><span>{metric.label}</span><strong>{metric.value}</strong><small className="positive">+{metric.change}% vs previous period</small><span className="card-link">View details <ArrowUpRight size={13}/></span></button> })}</section>
+    <section className="content-grid"><article className="panel"><div className="panel-header"><div><span className="eyebrow">Financial performance</span><h2>Revenue vs target</h2></div><span className="status"><Activity size={12}/> Live data</span></div><div className="chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={revenue}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="month" /><YAxis /><Tooltip /><Bar dataKey="revenue" radius={[6,6,0,0]} /><Bar dataKey="target" radius={[6,6,0,0]} /></BarChart></ResponsiveContainer></div></article>
+      <article className="panel"><div className="panel-header"><div><span className="eyebrow">Operational health</span><h2>Systems</h2></div><span className="status"><CheckCircle2 size={12}/> Healthy</span></div><div className="system-list">{['Core API','Payments','Notifications','Analytics'].map(system => <button className="system-row system-row-button" key={system} onClick={() => setSelectedSystem(system)}><span className="health-dot" /><span>{system}</span><small>Operational</small><ArrowUpRight size={14}/></button>)}</div></article></section>
+    {(reportOpen || selectedSystem) && <div className="modal-backdrop" role="presentation" onMouseDown={() => {setReportOpen(false);setSelectedSystem(null)}}><section className="modal panel" role="dialog" aria-modal="true" onMouseDown={event => event.stopPropagation()}><button className="modal-close" onClick={() => {setReportOpen(false);setSelectedSystem(null)}} aria-label="Close dialog"><X size={18}/></button>
+      {reportOpen ? <><span className="eyebrow">Report center</span><h2>Operational report</h2><p className="modal-copy">Your report is ready to be connected to the export and API layer.</p><div className="report-preview"><span>Revenue</span><strong>€248.5K</strong><span>Active customers</span><strong>1,284</strong><span>Projects</span><strong>86</strong></div><button className="primary-button" onClick={() => setReportOpen(false)}>Close preview</button></> : <><span className="eyebrow">Operational detail</span><h2>{selectedSystem}</h2><p className="modal-copy">Service status: operational. This detail panel is the interaction point for future telemetry, incidents and SLA metrics.</p><div className="detail-row"><span>Status</span><strong className="positive">Operational</strong></div><div className="detail-row"><span>Monitoring</span><strong>Enabled</strong></div><button className="primary-button" onClick={() => setSelectedSystem(null)}>Done</button></>}</section></div>}
   </main>
 }
