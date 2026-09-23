@@ -1,9 +1,11 @@
-import { Search, TrendingUp } from 'lucide-react'
+import { ArrowUpRight, Search, TrendingUp } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { companies } from '../data'
 export function CompaniesPage() {
- return <main className="page"><header className="page-header"><div><span className="eyebrow">Customers</span><h1>Companies</h1><p>Manage organizations and monitor account health.</p></div><button className="primary-button">Add company</button></header>
- <div className="toolbar"><div className="search"><Search size={16}/><input placeholder="Search companies..." aria-label="Search companies"/></div></div>
- <section className="table-panel panel"><table><thead><tr><th>Company</th><th>Industry</th><th>Status</th><th>Revenue</th><th>Trend</th></tr></thead><tbody>
- {companies.map(company => <tr key={company.id}><td><strong>{company.name}</strong></td><td>{company.industry}</td><td><span className={"badge "+company.status}>{company.status}</span></td><td>€{company.revenue.toLocaleString()}</td><td><TrendingUp size={16}/></td></tr>)}
- </tbody></table></section></main>
+ const [query,setQuery]=useState(''); const [selected,setSelected]=useState<string|null>(null)
+ const filtered=useMemo(()=>companies.filter(company=>company.name.toLowerCase().includes(query.toLowerCase())||company.industry.toLowerCase().includes(query.toLowerCase())),[query])
+ return <main className="page"><header className="page-header"><div><span className="eyebrow">Customers</span><h1>Companies</h1><p>Manage organizations and monitor account health.</p></div><button className="primary-button" onClick={()=>setSelected('new')}>Add company</button></header>
+ <div className="toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search companies..." aria-label="Search companies"/></div><span className="result-count">{filtered.length} organizations</span></div>
+ <section className="table-panel panel"><table><thead><tr><th>Company</th><th>Industry</th><th>Status</th><th>Revenue</th><th>Trend</th></tr></thead><tbody>{filtered.map(company => <tr key={company.id} onClick={()=>setSelected(company.name)} className="clickable-row"><td><strong>{company.name}</strong></td><td>{company.industry}</td><td><span className={"badge "+company.status}>{company.status}</span></td><td>€{company.revenue.toLocaleString()}</td><td><button className="icon-button" onClick={e=>{e.stopPropagation();setSelected(company.name)}} aria-label={`Open ${company.name}`}><TrendingUp size={16}/><ArrowUpRight size={13}/></button></td></tr>)}</tbody></table></section>
+ {selected && <div className="modal-backdrop" onMouseDown={()=>setSelected(null)}><section className="modal panel" role="dialog" aria-modal="true" onMouseDown={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setSelected(null)} aria-label="Close dialog">×</button><span className="eyebrow">{selected==='new'?'Company workspace':'Company overview'}</span><h2>{selected==='new'?'Create a company':selected}</h2><p className="modal-copy">{selected==='new'?'The company form is prepared for React Hook Form, Zod validation and API persistence.':'Open this workspace to connect contacts, projects, revenue history and account health.'}</p><button className="primary-button" onClick={()=>setSelected(null)}>Close</button></section></div>}</main>
 }
