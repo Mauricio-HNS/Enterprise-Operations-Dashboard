@@ -1,5 +1,9 @@
 # Enterprise Operations Dashboard
 
+![Enterprise Operations Dashboard](./docs/dashboard-preview.svg)
+
+> Senior-oriented React enterprise dashboard showcasing operational analytics, interactive workflows and an AI-ready frontend architecture.
+
 A production-oriented React + TypeScript dashboard for enterprise operations, analytics and AI-assisted decision support.
 
 ## Stack
