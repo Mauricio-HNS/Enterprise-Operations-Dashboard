@@ -1,6 +1,9 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Download, Filter, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
 import { revenue } from '../../dashboard/data'
 export function AnalyticsPage() {
- return <main className="page"><header className="page-header"><div><span className="eyebrow">Insights</span><h1>Analytics</h1><p>Explore trends across revenue and operational performance.</p></div></header>
- <section className="panel"><span className="eyebrow">Trend analysis</span><h2>Revenue trajectory</h2><div className="chart large-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={revenue}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="month"/><YAxis/><Tooltip/><Area dataKey="revenue" type="monotone" fillOpacity={0.18}/></AreaChart></ResponsiveContainer></div></section></main>
+ const [range,setRange]=useState('6 months'); const [message,setMessage]=useState('')
+ return <main className="page"><header className="page-header"><div><span className="eyebrow">Insights</span><h1>Analytics</h1><p>Explore trends across revenue and operational performance.</p></div><div className="header-actions"><button className="secondary-button" onClick={()=>setMessage('Data refreshed just now.')}><RefreshCw size={15}/> Refresh</button><button className="secondary-button" onClick={()=>setMessage('Export prepared for the reporting layer.')}><Download size={15}/> Export</button></div></header>
+ <section className="panel"><div className="panel-header"><div><span className="eyebrow">Trend analysis</span><h2>Revenue trajectory</h2></div><label className="select-control"><Filter size={14}/><select value={range} onChange={e=>setRange(e.target.value)}><option>6 months</option><option>12 months</option><option>Year to date</option></select></label></div><div className="chart large-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={revenue}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="month"/><YAxis/><Tooltip/><Area dataKey="revenue" type="monotone" fillOpacity={0.18}/></AreaChart></ResponsiveContainer></div>{message&&<div className="inline-feedback">{message}</div>}</section></main>
 }
